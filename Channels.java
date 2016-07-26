@@ -32,7 +32,7 @@ public class Channels {
                 if (entryName.startsWith(CHANNEL)) {  
                     ret = entryName;  
                     break;  
-                }  
+                }   
             }  
         } catch (IOException e) {  
             e.printStackTrace();  
