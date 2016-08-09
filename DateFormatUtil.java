@@ -1,7 +1,7 @@
 public class DateFormatUtil {  
   
     /** 
-     * ¸ñÊ½»¯ÈÕÆÚ 
+     * æ ¼å¼åŒ–æ—¥æœŸ  
      */  
     public static CharSequence formatDate(long time) {  
         return DateFormat.format("yyyy-MM-dd", time);  D
@@ -12,15 +12,15 @@ public class DateFormatUtil {
     }  
   
     public static CharSequence formatTimeWithoutYearField(long timeStamp) {  
-        return DateFormat.format("MMÔÂddÈÕ HH:mm:ss", timeStamp);  
+        return DateFormat.format("MMæœˆddæ—¥ HH:mm:ss", timeStamp);  
     }  
   
     public static CharSequence formatTimeWithoutYearField2(long timeStamp) {  
-        return DateFormat.format("MMÔÂddÈÕ HH:mm:ss", timeStamp);  
+        return DateFormat.format("MMæœˆddæ—¥ HH:mm:ss", timeStamp);  
     }  
   
     public static CharSequence formatTimeWithoutYearSecondField(long timeStamp) {  
-        return DateFormat.format("MMÔÂddÈÕ HH:mm", timeStamp);  
+        return DateFormat.format("MMæœˆddæ—¥ HH:mm", timeStamp);  
     }  
   
     public static CharSequence formatTimeWithoutYearSecondField1(long timeStamp) {  
