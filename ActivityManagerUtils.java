@@ -17,8 +17,18 @@ public class ActivityManagerUtils {
     private static ActivityManager mActivityManager;
 
     private ActivityManagerUtils() {
-
+		
     }
+
+	public static init(){
+		init(MyApplication.getContext());
+	}
+
+	public static init(Context context){
+		if (mActivityManager == null) {
+            mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        }
+	}
 
     public static ActivityManager getActivityManager() {
         return getActivityManager(MyApplication.getContext());
