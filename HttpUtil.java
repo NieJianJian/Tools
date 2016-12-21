@@ -1,6 +1,7 @@
-package my.njj.com.niejjtest;
+package njj.com.myapplication1;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -24,7 +25,7 @@ import java.util.Map;
  */
 public class HttpUtil {
 
-    String Path="http://test.bidit.cn/api/getServerTime/?clientType=1&version=4&versionName=test_2.0.2";
+    String Path = "http://test.bidit.cn/api/getServerTime/?clientType=1&version=4&versionName=test_2.0.2";
 
     /**
      * @param address
@@ -34,22 +35,22 @@ public class HttpUtil {
      * 除非使用runOnUiThread()方法。
      */
     public static void sendHttpRequest(final String address,
-                                       final Map<String,String> params,
+                                       final Map<String, String> params,
                                        final HttpCallbackListener listener) {
         HttpURLConnection connection = null;
         try {
             URL url = new URL(address);
             connection = (HttpURLConnection) url.openConnection();
 
-			// 请求方式：GET 或者 POST
-            connection.setRequestMethod("GET"); 
-			// 设置读取超时时间
+            // 请求方式：GET 或者 POST
+            connection.setRequestMethod("POST");
+            // 设置读取超时时间
             connection.setReadTimeout(5000);
-			// 设置连接超时时间
+            // 设置连接超时时间
             connection.setConnectTimeout(5000);
-			// 接收输入流
+            // 接收输入流
             connection.setDoInput(true);
-			// 启动输出流，当需要传递参数时开启
+            // 启动输出流，当需要传递参数时开启
             connection.setDoOutput(true);
             /*
              * 添加Header，告诉服务端一些信息，比如读取某个文件的多少字节到多少字节，是不是可以压缩传输，
@@ -58,7 +59,7 @@ public class HttpUtil {
 //            connection.setRequestProperty("Connection","Keep-Alive"); // 维持长连接
 //            connection.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
             // 添加参数, 写入参数之前不能读取服务器响应，如获得code
-            addParams(connection.getOutputStream(),params);
+            addParams(address, connection.getOutputStream(), params);
 
             // 发起请求
             connection.connect();
@@ -69,6 +70,10 @@ public class HttpUtil {
             InputStream is = connection.getInputStream();
             // 服务器响应code，200表示请求成功并返回
             int code = connection.getResponseCode();
+            if (code != HttpURLConnection.HTTP_OK) {
+                listener.onError("错误code = " + code);
+                return;
+            }
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             StringBuilder response = new StringBuilder();
@@ -85,7 +90,7 @@ public class HttpUtil {
         } catch (Exception e) {
             e.printStackTrace();
             if (listener != null) {
-                listener.onError(e);
+                listener.onError(e.toString());
             }
             /*return e.getMessage();*/
         } finally {
@@ -95,26 +100,26 @@ public class HttpUtil {
 
     /**
      * 使用NameValuePair和BasicNameValuePair需要在build.gradle中的android闭包中添加：
-     *     useLibrary 'org.apache.http.legacy'
+     * useLibrary 'org.apache.http.legacy'
      */
-    private static void addParams(OutputStream output, Map<String, String> params)
+    private static void addParams(String address, OutputStream output, Map<String, String> params)
             throws IOException {
         List<NameValuePair> paramList = new ArrayList<>();
-        for (Map.Entry<String,String> entry : params.entrySet()){
+        for (Map.Entry<String, String> entry : params.entrySet()) {
             paramList.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
         }
 
         StringBuilder paramStr = new StringBuilder();
-        for (NameValuePair pair : paramList){
-            if (!TextUtils.isEmpty(paramStr)){
+        for (NameValuePair pair : paramList) {
+            if (!TextUtils.isEmpty(paramStr)) {
                 paramStr.append("&");
             }
-            paramStr.append(URLEncoder.encode(pair.getName(),"UTF-8"));
+            paramStr.append(URLEncoder.encode(pair.getName(), "UTF-8"));
             paramStr.append("=");
-            paramStr.append(URLEncoder.encode(pair.getValue(),"UTF-8"));
+            paramStr.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
         }
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output,"UTF-8"));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
         // 将参数写入到输出流
         writer.write(paramStr.toString());
         // 刷新对象输出流，将任何字节都写入潜在的流中
@@ -122,12 +127,20 @@ public class HttpUtil {
         // 关闭流对象。此时，不能再向对象输出流写入任何数据，先前写入的数据存在于内存缓冲区中,
         // 之后调用的getInputStream()函数时才把准备好的http请求正式发送到服务器
         writer.close();
+
+        /**
+         * 打印请求全路径的url
+         */
+        StringBuilder urlStr = new StringBuilder(address);
+        urlStr.append("?");
+        urlStr.append(paramStr.toString());
+        Log.i("niejianjian", " -> url -> " + urlStr);
     }
 
     public interface HttpCallbackListener {
         void onSuccess(String response);
 
-        void onError(Exception e);
+        void onError(String errorInfo);
     }
 
 }
